@@ -4,59 +4,58 @@
 #include <unistd.h> //system()
 
 using namespace std;
-//Global Variable
-string current_user;
-int current_codeNumber;
 
-
-class User
+class User  
 {
 private:
+    int ID;
     string full_name;
     string password;
-    int code_number;
+    int Student_code;
     bool admin;
 public:
-    User(string fullname, string pass, int codeNumber, bool isAdmin)
+    User(string fullname, string pass, int stCode, bool isAdmin)
     {
         full_name = fullname;
         password = pass;
-        code_number = codeNumber;
+        Student_code = stCode;
         admin = isAdmin;
     }
     void set_full_name(string name)
     {
-        if (admin == true || current_user == full_name && current_codeNumber == code_number)
-        {
-            full_name = name;
-        }
-        else
-        {
-            printf("Acsess Denid\n");
-        }
+        full_name = name;
     }
     void set_password(string pass)
     {
-        if ( admin == true || current_user == full_name && current_codeNumber == code_number)
-        {
-            password = pass;
-        }
-        else
-        {
-            printf("Acsess Denid\n");
-        }
+        password = pass;
+    }
+    string getId()
+    {
+        return to_string(ID);
     }
     bool is_admin()
     {
         return admin;
     }
+    void set_admin(bool isAdmin)
+    {
+        admin = isAdmin;
+    }
     string get_name()
     {
         return full_name;
     }
+    void setID(int id)
+    {
+        ID = id;
+    }
+    string get_password()
+    {
+        return password;
+    }
     void print_all_detail()
     {
-        printf("\n full_name: %s \n password: %s \n code_number: %i \n isAdmin %b", full_name.c_str(), password.c_str(), code_number, admin);
+        printf("\n full_name: %s \n password: %s \n code_number: %i \n isAdmin %b", full_name.c_str(), password.c_str(), Student_code, admin);
     } 
 };
 
@@ -90,8 +89,6 @@ User Login(string user, string pass, string code, sqlite3* db)
     std::string username(usernameC ? reinterpret_cast<const char*>(usernameC): "NULL");
     std::string password(passwordC ? reinterpret_cast<const char*>(passwordC) : "NULL");
 
-    current_user = username;
-    current_codeNumber = codenumber;
 
     User current_user(username, password, codenumber, admin);
 
@@ -215,7 +212,209 @@ bool createUser(sqlite3* db)
         
     }
 
-User search_user(sqlite3* db, string searchText, int type)  // type 1(search with fullname) 2(with student code) 3(with id)
+bool edit_user(sqlite3* db, string userId)
+{   
+    string command = "SELECT id,username,code,password,admin FROM users WHERE id="+ userId +"";
+
+    sqlite3_stmt* stmt;
+    if(sqlite3_prepare_v2(db, command.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
+    {
+        printf("Database Error\n");
+        cin.get();
+        return false;
+    }
+
+    if(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        const int id = sqlite3_column_int(stmt, 0);
+        const char* username = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        const int stcode = (sqlite3_column_int(stmt, 2));
+        const char* password = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        const int admin = sqlite3_column_int(stmt, 3);
+
+        string usernameS(username);
+        string passwordS(password);
+        
+
+
+
+        bool adminBool = (admin == 1) ? 1 : 0;
+
+        User edited_user(usernameS, passwordS, stcode, adminBool);
+        edited_user.setID(id);  
+        
+        while(true)
+        {
+            #ifdef __WIN32
+            system("cls");
+            #else
+            system("clear");
+            #endif
+            
+            
+            printf("%s-Username: %s \n", edited_user.getId().c_str(), edited_user.get_name().c_str());
+            printf("Password: %s \n \n", edited_user.get_password().c_str());
+            
+            printf("1-Edit\n");
+            printf("2-Delete\n");
+
+
+            if(edited_user.is_admin())
+            {
+                printf("3-Downgrade to User\n");
+            }
+            else
+            {
+                printf("3-Upgrade to Admin\n");
+            }
+            printf("9-Unsave and Exit\n");
+            printf("0-Save and Exit\n");
+
+            string input;
+            printf("#: ");
+            getline(cin, input);
+
+
+            if(input == "1")
+            { 
+                #ifdef __WIN32
+                system("cls");
+                #else
+                system("clear");
+                #endif
+                printf("1-Username\n");
+                printf("2-Password\n\n");
+
+                string select_usr_or_pass;
+                printf("#: ");
+                getline(cin,select_usr_or_pass);
+                printf("\n\n");
+
+                string changed_value;
+                string chagne_command;
+                if(select_usr_or_pass == "1")
+                {
+                    printf("Enter Username: ");
+                    getline(cin,changed_value);
+                    chagne_command = "UPDATE users SET username='"+ changed_value +"' WHERE id="+ edited_user.getId() +";";
+
+                }
+                else if(select_usr_or_pass == "2")
+                {
+                    printf("Enter Password: ");
+                    getline(cin,changed_value);
+                    chagne_command = "UPDATE users SET password='"+ changed_value +"' WHERE id="+ edited_user.getId() +";";
+                }
+                else
+                {
+                    printf("Invalid Number!");
+                    continue;
+                }
+                
+                char* errdb;
+                //edit database
+                if(sqlite3_exec(db, chagne_command.c_str(), nullptr, nullptr, &errdb) != SQLITE_OK)
+                {
+                    printf("Change Error: %s", errdb);
+                    cin.get();
+                    continue;
+                }
+
+                //Edite Cache
+                if(select_usr_or_pass == "1")
+                {
+                    edited_user.set_full_name(changed_value);
+                }
+                else if(select_usr_or_pass == "2")
+                {
+                    edited_user.set_password(changed_value);
+                }
+
+                printf("Sucsess");
+                cin.get();
+
+
+
+
+                
+
+
+
+            }
+            else if(input == "2")
+            {
+                string command = "DELETE FROM users where id="+ edited_user.getId() +";";
+                char* errdb;
+                if(sqlite3_exec(db, command.c_str(), nullptr,nullptr, &errdb))
+                {
+                    printf("Delete Error: %s", errdb);
+                    cin.get();
+                    continue;
+                }
+                
+                printf("Sucsess");
+                cin.get();
+                break;
+                
+            }
+            else if(input == "3")
+            {
+                string command;
+                if(!edited_user.is_admin()) // Admin to User , User to Admin
+                {
+                    command = "UPDATE users SET admin=1 WHERE id="+ edited_user.getId() +";";
+                }
+                else
+                {
+                    command = "UPDATE users SET admin=0 WHERE id="+ edited_user.getId() +";";
+                }
+
+                char* errdb;
+                // Set To database
+                if(sqlite3_exec(db,command.c_str(), nullptr,nullptr, &errdb) != SQLITE_OK)
+                {
+                    printf("Database Error: %s", errdb);
+                    cin.get();
+                    continue;
+                }
+                
+                //change catch
+                edited_user.is_admin() ? edited_user.set_admin(false) : edited_user.set_admin(true);
+
+                printf("Sucsess");
+                cin.get();
+
+            }
+            else if(input == "0")
+            {
+
+            }
+            else if(input == "9")
+            {
+
+            }
+            else
+            {
+                printf("Invalid Number!");
+                cin.get();
+                continue;
+            }
+
+        }
+
+
+    }
+    else
+    {
+        printf("User Not Found!!!");
+        cin.get();
+    }
+
+
+    return false;
+} 
+
+bool search_user(sqlite3* db, string searchText, int type)  // type 1(search with fullname) 2(with student code) 3(with id)
 {
     printf("--------------------\n");
     string command;
@@ -247,7 +446,7 @@ User search_user(sqlite3* db, string searchText, int type)  // type 1(search wit
             {
                 printf("User Not Found");
                 cin.get();
-                return User("", "", -1, 1); // Return Error(Unvalid User)
+                return false;
             }
             break;
         }
@@ -264,19 +463,22 @@ User search_user(sqlite3* db, string searchText, int type)  // type 1(search wit
     }
 
 
-    cin.get();
-    // sleep(1);
-    // string select_id;
-    // printf("\nSelect User by id(null for continue): ");
-    // getline(cin, select_id);
-    return User("pass", "pass", 0, 1);
+    sleep(1);
+    string select_id;
+    printf("\nSelect User by id(null for continue): ");
+    getline(cin, select_id);
+    if(select_id == "")
+    {
+        return true;
+    }
+
+    return edit_user(db, select_id);
+
+    
     
 }
 
-bool edit_user(sqlite3* db, const int userID)
-{   
-    return false;
-}  
+ 
 
 int main()
 {
