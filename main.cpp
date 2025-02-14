@@ -238,9 +238,10 @@ bool edit_user(sqlite3* db, string userId)
 
 
         bool adminBool = (admin == 1) ? 1 : 0;
-        
+
         User edited_user(usernameS, passwordS, stcode, adminBool);
         edited_user.setID(id);  
+        
         
         while(true)
         {
