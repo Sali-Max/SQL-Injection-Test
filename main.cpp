@@ -184,7 +184,7 @@ bool createUser(sqlite3* db)
 
         if(stt == SQLITE_OK)
         {
-            printf("Sucsess\n");
+            printf("success\n");
         }
         else
         {
@@ -273,6 +273,7 @@ bool edit_user(sqlite3* db, string userId)
             string input;
             printf("#: ");
             getline(cin, input);
+            cout << "\n";
 
 
             if(input == "1")
@@ -295,31 +296,19 @@ bool edit_user(sqlite3* db, string userId)
                 if(select_usr_or_pass == "1")
                 {
                     printf("Enter Username: ");
-                    getline(cin,changed_value);
-                    chagne_command = "UPDATE users SET username='"+ changed_value +"' WHERE id="+ edited_user.getId() +";";
-
                 }
                 else if(select_usr_or_pass == "2")
                 {
                     printf("Enter Password: ");
-                    getline(cin,changed_value);
-                    chagne_command = "UPDATE users SET password='"+ changed_value +"' WHERE id="+ edited_user.getId() +";";
                 }
                 else
                 {
                     printf("Invalid Number!");
                     continue;
                 }
-                
-                char* errdb;
-                //edit database
-                if(sqlite3_exec(db, chagne_command.c_str(), nullptr, nullptr, &errdb) != SQLITE_OK)
-                {
-                    printf("Change Error: %s", errdb);
-                    cin.get();
-                    continue;
-                }
 
+                getline(cin,changed_value);
+                
                 //Edite Cache
                 if(select_usr_or_pass == "1")
                 {
@@ -330,7 +319,7 @@ bool edit_user(sqlite3* db, string userId)
                     edited_user.set_password(changed_value);
                 }
 
-                printf("Sucsess");
+                printf("success");
                 cin.get();
 
 
@@ -351,47 +340,92 @@ bool edit_user(sqlite3* db, string userId)
                     cin.get();
                     continue;
                 }
-                
-                printf("Sucsess");
-                cin.get();
-                break;
-                
-            }
-            else if(input == "3")
-            {
-                string command;
-                if(!edited_user.is_admin()) // Admin to User , User to Admin
+
+                string delete_ok;
+                printf("DELETE %s Account?(y/N): ", edited_user.get_name().c_str());
+                getline(cin, delete_ok);
+                if(delete_ok != "y" || delete_ok != "Y")
                 {
-                    command = "UPDATE users SET admin=1 WHERE id="+ edited_user.getId() +";";
+                    continue;
                 }
                 else
                 {
-                    command = "UPDATE users SET admin=0 WHERE id="+ edited_user.getId() +";";
+                    printf("Delete Succesful");
+                    cin.get();
+                    break;
+
                 }
 
-                char* errdb;
-                // Set To database
-                if(sqlite3_exec(db,command.c_str(), nullptr,nullptr, &errdb) != SQLITE_OK)
-                {
-                    printf("Database Error: %s", errdb);
-                    cin.get();
-                    continue;
-                }
                 
-                //change catch
+                
+            }
+            else if(input == "3")
+            {                
+                //change cache
                 edited_user.is_admin() ? edited_user.set_admin(false) : edited_user.set_admin(true);
 
-                printf("Sucsess");
+                printf("success");
                 cin.get();
-
             }
             else if(input == "0")
             {
+                string isAdmin = edited_user.is_admin() ? "1" : "0";
+                string command_username = "UPDATE users SET username='"+ edited_user.get_name() +"' WHERE id="+ edited_user.getId() +" ;";
+                string command_password = "UPDATE users SET password='"+ edited_user.get_password() +"' WHERE id="+ edited_user.getId() +" ;";
+                string command_admin = "UPDATE users SET admin="+ isAdmin +" WHERE id="+ edited_user.getId() +" ;";
+                
+                int total_error = 0;
+                int total_sucsess = 0;
+                char* dberr;
+
+                if(sqlite3_exec(db, command_username.c_str(), nullptr, nullptr, &dberr) != SQLITE_OK)
+                {
+                    printf("username apply ERROR: %s\n", dberr);
+                    total_error++;
+                }
+                else
+                {
+                    total_sucsess++;
+                }
+                if(sqlite3_exec(db, command_password.c_str(), nullptr, nullptr, &dberr) != SQLITE_OK)
+                {
+                    printf("password apply ERROR: %s\n", dberr);
+                    total_error++;
+                }
+                else
+                {
+                    total_sucsess++;
+                }
+                if(sqlite3_exec(db, command_admin.c_str(), nullptr, nullptr, &dberr) != SQLITE_OK)
+                {
+                    printf("admin apply ERROR: %s\n", dberr);
+                    total_error++;
+                }
+                else
+                {
+                    total_sucsess++;
+                }
+
+                printf("\nFail %d \nSuccess %d", total_error, total_sucsess);
+                cin.get();
+                break;
+                
+
 
             }
             else if(input == "9")
             {
-
+                string delete_ok;
+                printf("Exit?(y/N): ");
+                getline(cin, delete_ok);
+                if(delete_ok != "y" || delete_ok != "Y")
+                {
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
             }
             else
             {
