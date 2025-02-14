@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 #include <string>
 #include <unistd.h> //system()
+
 using namespace std;
 //Global Variable
 string current_user;
@@ -55,12 +56,12 @@ public:
     }
     void print_all_detail()
     {
-        printf("full_name: %s \n password: %s \n code_number: %i \n isAdmin %b", full_name.c_str(), password.c_str(), code_number, admin);
+        printf("\n full_name: %s \n password: %s \n code_number: %i \n isAdmin %b", full_name.c_str(), password.c_str(), code_number, admin);
     } 
 };
 
-
-User checkAvilable_user_and_password_and_code(string user, string pass, string code, sqlite3* db)
+// Login Function
+User Login(string user, string pass, string code, sqlite3* db)
 {
     string command = "SELECT * FROM users WHERE username='" + user +  "' AND password='" + pass +  "' AND code='" + code + "'; ";
 
@@ -89,6 +90,9 @@ User checkAvilable_user_and_password_and_code(string user, string pass, string c
     std::string username(usernameC ? reinterpret_cast<const char*>(usernameC): "NULL");
     std::string password(passwordC ? reinterpret_cast<const char*>(passwordC) : "NULL");
 
+    current_user = username;
+    current_codeNumber = codenumber;
+
     User current_user(username, password, codenumber, admin);
 
 
@@ -96,19 +100,130 @@ User checkAvilable_user_and_password_and_code(string user, string pass, string c
     
 }
 
+bool list_all_user(sqlite3* db)
+{
+    #ifdef _WIN32
+    system("cls");
+    #else
+    system("clear");
+    #endif
+
+    const char* command = "SELECT id,username FROM users ORDER BY id ASC";
+
+    sqlite3_stmt* stmt;
+    if(sqlite3_prepare_v2(db, command, -1, &stmt, nullptr) != SQLITE_OK)
+    {
+        printf("Database Error \n");
+    }
+
+
+    unsigned int number_of_loop = 0;
+    while(true)
+    {
+        if(sqlite3_step(stmt) != SQLITE_ROW)
+        {
+            if(number_of_loop == 0)
+            {
+                printf("User Not Found\n");
+                break;
+            }
+            break;
+        }
+        number_of_loop++;
+        
+        const char* id = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        const char* user = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+
+        printf("%s-%s\n", id, user);
+    }
+    
+
+    cout << "\nEnter any key to continue";
+    sleep(1);
+    cin.get();
+    
+    return true;
+}
+
+bool createUser(sqlite3* db)
+{   
+    while (true)
+    {   
+        string fullname;
+        string password;
+        string isAdmin;
+        string studentCode;
+        srand(time(0)); //set seed
+        
+        printf("Enter Fullname: ");
+        getline(cin, fullname);
+        cout << "\n";
+        
+        printf("Enter Password: ");
+        getline(cin, password);
+        cout << "\n";
+    
+    
+        printf("isAdmin?(y/N): ");
+        getline(cin, isAdmin);
+        cout << "\n";
+        
+        if(isAdmin == "y" || isAdmin == "Y")    //is admin set Binary variable
+        {
+            isAdmin = "1";
+        }
+        else
+        {
+            isAdmin = "0";
+        }
+        
+        studentCode = to_string((rand() % 1000000000) + (time(0) % 1000)); //generate Random number
+
+
+        string command = "INSERT INTO users (username, password, code, admin) VALUES ('"+ fullname +"', '"+ password +"', "+ studentCode +", "+ isAdmin +");";
+        printf("\ncommand: %s\n", command.c_str());
+
+        char* errdb;
+        int stt = sqlite3_exec(db, command.c_str(), nullptr, nullptr, &errdb);
+
+        if(stt == SQLITE_OK)
+        {
+            printf("Sucsess\n");
+        }
+        else
+        {
+            printf("Error: %s \n", errdb);
+            sqlite3_free(errdb);
+        }
 
 
 
 
+
+        string conti;
+        printf("Continiue? (Y/n): ");
+        getline(cin, conti);
+        if(conti == "n" || conti == "N")
+        {
+            return true;
+        }
+        else
+        {
+            continue;
+        }
+    }
+        
+    }
 
 int main()
 {
     sqlite3* DB;
     sqlite3_open("Student.db", &DB);
-    int stt = sqlite3_exec(DB, "CREATE TABLE IF NOT EXISTS users (id INITIALLY PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL,code INTIGER NOT NULL, admin INTIGER NOT NULL);", nullptr, nullptr, nullptr);
+    int stt = sqlite3_exec(DB, "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT , username TEXT NOT NULL, password TEXT NOT NULL,code INTIGER NOT NULL, admin INTIGER NOT NULL);", nullptr, nullptr, nullptr);
     if(stt != SQLITE_OK)
     {
         printf("Error: To Connect Database");
+        return 1;
     }
 
 
@@ -127,11 +242,12 @@ int main()
     getline(cin, code_number);
     
 
-    User current_user = checkAvilable_user_and_password_and_code(username, password, code_number, DB);
+    User current_user = Login(username, password, code_number, DB);
     
     // get Controll Shell
     printf("Welcome: %s\n", (current_user.get_name()).c_str());
 
+    
     while (true)
     {
         #ifdef __WIN32
@@ -142,7 +258,11 @@ int main()
 
         printf("1- Show Profile\n");
         printf("2- Edit Profile\n");
-        // 3- admin edit all users
+        if(current_user.is_admin()) //  admin options
+        {
+            printf("3- Create User\n");
+            printf("4- List All User\n");
+        }
         printf("0- Exit\n");
 
         string input;
@@ -152,12 +272,34 @@ int main()
         if(input == "1")
         {
             current_user.print_all_detail();
-            cout << "\nEnter key to continue";
+            cout << "\n\nEnter key to continue";
             cin.get();
         }
         else if(input == "2")
         {
             continue;
+        }
+        else if (input == "3")
+        {
+            if(current_user.is_admin()) // Admin Check
+            {
+                createUser(DB);
+            }
+            else
+            {
+                continue;
+            }
+        }
+        else if (input == "4")
+        {
+            if(current_user.is_admin()) // Admin Check
+            {
+                list_all_user(DB);
+            }
+            else
+            {
+                continue;
+            }
         }
         else if(input == "0")
         {
