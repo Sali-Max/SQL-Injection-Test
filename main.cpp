@@ -215,6 +215,69 @@ bool createUser(sqlite3* db)
         
     }
 
+User search_user(sqlite3* db, string searchText, int type)  // type 1(search with fullname) 2(with student code) 3(with id)
+{
+    printf("--------------------\n");
+    string command;
+    if(type == 1)
+    {
+        command = "SELECT id,username,code FROM users WHERE username LIKE '%"+ searchText +"%'";
+    }
+    else if(type == 2)
+    {
+        command = "SELECT id,username,code FROM users WHERE code LIKE '%"+ searchText +"%'";
+    }
+    else if(type == 3)
+    {
+        command = "SELECT id,username,code FROM users WHERE id LIKE '%"+ searchText +"%'";
+    }
+
+    sqlite3_stmt* stmt;
+    if(sqlite3_prepare_v2(db, command.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
+    {
+        printf("Search Error: Database Err\n");
+    }
+
+    int number_of_loop = 0;
+    while(true)
+    {
+        if(sqlite3_step(stmt) != SQLITE_ROW)
+        {
+            if(number_of_loop == 0)
+            {
+                printf("User Not Found");
+                cin.get();
+                return User("", "", -1, 1); // Return Error(Unvalid User)
+            }
+            break;
+        }
+        number_of_loop++;
+
+        const char* id = reinterpret_cast<const char*>(sqlite3_column_text(stmt,0));
+        const char* username = reinterpret_cast<const char*>(sqlite3_column_text(stmt,1));
+        const char* studentCode = reinterpret_cast<const char*>(sqlite3_column_text(stmt,2));
+
+        printf("%s-%s - StCode:%s\n", id, username, studentCode);
+
+
+        
+    }
+
+
+    cin.get();
+    // sleep(1);
+    // string select_id;
+    // printf("\nSelect User by id(null for continue): ");
+    // getline(cin, select_id);
+    return User("pass", "pass", 0, 1);
+    
+}
+
+bool edit_user(sqlite3* db, const int userID)
+{   
+    return false;
+}  
+
 int main()
 {
     sqlite3* DB;
@@ -260,8 +323,10 @@ int main()
         printf("2- Edit Profile\n");
         if(current_user.is_admin()) //  admin options
         {
-            printf("3- Create User\n");
+            printf("\n3- Create User\n");
             printf("4- List All User\n");
+            printf("5- Search User\n\n");
+
         }
         printf("0- Exit\n");
 
@@ -295,6 +360,39 @@ int main()
             if(current_user.is_admin()) // Admin Check
             {
                 list_all_user(DB);
+            }
+            else
+            {
+                continue;
+            }
+        }
+        else if (input == "5")
+        {
+            if(current_user.is_admin()) // Admin Check
+            {
+                string search_method;
+                printf("\n1-by name\n");
+                printf("2-by Student code\n");
+                printf("3-by id\n\n");
+                printf("Search method: ");
+                getline(cin, search_method);
+                cout << "\n";
+
+                if(search_method != "1" && search_method != "2" && search_method != "3")
+                {
+                    printf("Not Avilable Method");
+                    cin.get();
+                    continue;
+                }
+
+
+                string search_text;
+                printf("Search Text: ");
+                getline(cin, search_text);
+                cout << "\n";
+
+
+                search_user(DB, search_text, stoi(search_method));
             }
             else
             {
