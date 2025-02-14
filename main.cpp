@@ -136,7 +136,6 @@ bool list_all_user(sqlite3* db)
     
 
     cout << "\nEnter any key to continue";
-    sleep(1);
     cin.get();
     
     return true;
@@ -230,7 +229,7 @@ bool edit_user(sqlite3* db, string userId)
         const char* username = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
         const int stcode = (sqlite3_column_int(stmt, 2));
         const char* password = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
-        const int admin = sqlite3_column_int(stmt, 3);
+        const int admin = sqlite3_column_int(stmt, 4);
 
         string usernameS(username);
         string passwordS(password);
@@ -239,7 +238,7 @@ bool edit_user(sqlite3* db, string userId)
 
 
         bool adminBool = (admin == 1) ? 1 : 0;
-
+        
         User edited_user(usernameS, passwordS, stcode, adminBool);
         edited_user.setID(id);  
         
@@ -258,7 +257,7 @@ bool edit_user(sqlite3* db, string userId)
             printf("1-Edit\n");
             printf("2-Delete\n");
 
-
+            
             if(edited_user.is_admin())
             {
                 printf("3-Downgrade to User\n");
@@ -463,7 +462,6 @@ bool search_user(sqlite3* db, string searchText, int type)  // type 1(search wit
     }
 
 
-    sleep(1);
     string select_id;
     printf("\nSelect User by id(null for continue): ");
     getline(cin, select_id);
