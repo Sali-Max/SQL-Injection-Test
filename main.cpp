@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
-
+#include <unistd.h> //system()
 using namespace std;
 //Global Variable
 string current_user;
@@ -16,11 +16,12 @@ private:
     int code_number;
     bool admin;
 public:
-    User(string fullname, string pass, int codeNumber)
+    User(string fullname, string pass, int codeNumber, bool isAdmin)
     {
         full_name = fullname;
         password = pass;
         code_number = codeNumber;
+        admin = isAdmin;
     }
     void set_full_name(string name)
     {
@@ -44,9 +45,17 @@ public:
             printf("Acsess Denid\n");
         }
     }
-    void print_all_deteil()
+    bool is_admin()
     {
-        printf("full_name: %s \n password: %s \n code_number: %i \n isAdmin %b", full_name, password, code_number, admin);
+        return admin;
+    }
+    string get_name()
+    {
+        return full_name;
+    }
+    void print_all_detail()
+    {
+        printf("full_name: %s \n password: %s \n code_number: %i \n isAdmin %b", full_name.c_str(), password.c_str(), code_number, admin);
     } 
 };
 
@@ -75,13 +84,13 @@ User checkAvilable_user_and_password_and_code(string user, string pass, string c
     const unsigned char* usernameC = sqlite3_column_text(stmt, 1);
     const unsigned char* passwordC = sqlite3_column_text(stmt, 2);
     const int codenumber = sqlite3_column_int(stmt, 3);
+    const int admin = sqlite3_column_int(stmt, 4);
 
-    std::string username(reinterpret_cast<const char*>(usernameC));
-    std::string password(reinterpret_cast<const char*>(usernameC));
-    
+    std::string username(usernameC ? reinterpret_cast<const char*>(usernameC): "NULL");
+    std::string password(passwordC ? reinterpret_cast<const char*>(passwordC) : "NULL");
 
-    User current_user(username, password, codenumber);
-    current_user.print_all_deteil();
+    User current_user(username, password, codenumber, admin);
+
 
     return current_user;
     
@@ -96,7 +105,7 @@ int main()
 {
     sqlite3* DB;
     sqlite3_open("Student.db", &DB);
-    int stt = sqlite3_exec(DB, "CREATE TABLE IF NOT EXISTS users (id INITIALLY PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL,code INTIGER NOT NULL, admin BOOL NOT NULL);", nullptr, nullptr, nullptr);
+    int stt = sqlite3_exec(DB, "CREATE TABLE IF NOT EXISTS users (id INITIALLY PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL,code INTIGER NOT NULL, admin INTIGER NOT NULL);", nullptr, nullptr, nullptr);
     if(stt != SQLITE_OK)
     {
         printf("Error: To Connect Database");
@@ -118,13 +127,43 @@ int main()
     getline(cin, code_number);
     
 
-    if(checkAvilable_user_and_password_and_code(username, password, code_number, DB))
+    User current_user = checkAvilable_user_and_password_and_code(username, password, code_number, DB);
+    
+    // get Controll Shell
+    printf("Welcome: %s\n", (current_user.get_name()).c_str());
+
+    while (true)
     {
-        
-    }
-    else
-    {
-        printf("Fail to Logon");
+        #ifdef __WIN32
+        system("cls");
+        #else
+        system("clear");
+        #endif
+
+        printf("1- Show Profile\n");
+        printf("2- Edit Profile\n");
+        // 3- admin edit all users
+        printf("0- Exit\n");
+
+        string input;
+        cout << "#: ";
+        getline(cin, input);
+
+        if(input == "1")
+        {
+            current_user.print_all_detail();
+            cout << "\nEnter key to continue";
+            cin.get();
+        }
+        else if(input == "2")
+        {
+            continue;
+        }
+        else if(input == "0")
+        {
+            sqlite3_close(DB);
+            return 0;
+        }
     }
     
 
