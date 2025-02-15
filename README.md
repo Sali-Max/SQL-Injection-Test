@@ -1,4 +1,4 @@
-# 🔥 Student Management - SQL Injection Vulnerable 🔥  
+# 🔥 Student Management System - SQL Injection Vulnerable 🔥  
 
 🚨 **WARNING: This program contains a deliberate SQL Injection vulnerability!** 🚨  
 
@@ -12,11 +12,9 @@ It is designed for **cybersecurity enthusiasts, ethical hackers, and penetration
 ## 🛠️ **Features & Vulnerabilities**  
 
 ✔️ **Student Management System** with **SQLite3 Database** 
-✔️ **Deliberate SQL Injection Vulnerability** for testing 
-✔️ **User Authentication System** (🚨 Vulnerable 🚨) 
-✔️ **Two Predefined Users in the Database**:
-✔️ **Test & Improve Your SQL Injection Skills**  
-✔️ **Designed for GNU/Linux** (❌ *Does NOT support Windows* ❌)  
+💀 **Deliberate SQL Injection Vulnerability** for testing 
+🔑 **User Authentication System** (🚨 Vulnerable 🚨) 
+🐧 **Only Designed for GNU/Linux** (❌ *Does NOT support Windows* ❌)  
 
 ---
 
@@ -41,11 +39,11 @@ g++ main.cpp -o student_manager -lsqlite3
 ### 4️⃣ **Login Credentials (Default Users)**  
 | Role  | Username | Password |
 |-------|---------|----------|
-| Normal User | `user` | `1234` |
+| Normal User | `user` | `user` |
 | Admin | `root` | `root` |
 
-📌 **Try SQL Injection Attacks!**  
-Use basic SQL Injection payloads to bypass authentication!  
+💀 **Try SQL Injection Attacks!**  
+Use basic SQL Injection payloads to bypass authentication! 
 
 Example:  
 ```
