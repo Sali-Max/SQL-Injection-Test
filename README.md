@@ -9,13 +9,6 @@ It is designed for **cybersecurity enthusiasts, ethical hackers, and penetration
 
 ---
 
-## ⚠️ **Disclaimer** ⚠️  
-**This program is for educational and research purposes only.**  
-**The author is NOT responsible for any misuse.**  
-Use it **only in legal and ethical ways** to improve security knowledge!  
-
----
-
 ## 🛠️ **Features & Vulnerabilities**  
 
 ✔️ **Student Management System** with **SQLite3 Database**  
@@ -33,8 +26,8 @@ Use it **only in legal and ethical ways** to improve security knowledge!
 
 ### 1️⃣ **Clone the Repository**  
 ```bash
-git clone https://github.com/YOUR_GITHUB/Student-SQLi-Vulnerable.git
-cd Student-SQLi-Vulnerable
+git clone https://github.com/Sali-Max/SQL-Injection-Test.git
+cd SQL-Injection-Test
 ```
 
 ### 2️⃣ **Compile the Program**  
@@ -62,16 +55,6 @@ Username: admin' --
 Password: (leave empty)
 ```
 
----
-
-## 🎯 **Why Use This Project?**  
-
-🔸 **Test SQL Injection vulnerabilities** in a **real-world-like scenario**  
-🔸 **Learn how attackers exploit weak authentication systems**  
-🔸 **Practice SQL Injection techniques** like `' OR 1=1 --`  
-🔸 **Understand database security and how to prevent attacks**  
-
-🚀 **Perfect for security researchers, ethical hackers, and cybersecurity learners!**  
 
 ---
 
@@ -82,4 +65,4 @@ This program is **NOT SECURE** and must **NEVER be used in production**.
 ---
 
 ## ⭐ **Support & Contributions**  
-If you like this project, **give it a star ⭐ on GitHub** and share it with your friends!  
+If you like this project, **give it a star ⭐ on GitHub**.
