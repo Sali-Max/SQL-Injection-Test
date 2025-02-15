@@ -1,4 +1,4 @@
-# 🔥 Student Management System - SQL Injection Vulnerable 🔥  
+# 🔥 Student Management - SQL Injection Vulnerable 🔥  
 
 🚨 **WARNING: This program contains a deliberate SQL Injection vulnerability!** 🚨  
 
@@ -11,12 +11,10 @@ It is designed for **cybersecurity enthusiasts, ethical hackers, and penetration
 
 ## 🛠️ **Features & Vulnerabilities**  
 
-✔️ **Student Management System** with **SQLite3 Database**  
-✔️ **Deliberate SQL Injection Vulnerability** for testing  
-✔️ **User Authentication System** (🚨 Vulnerable 🚨)  
-✔️ **Two Predefined Users in the Database**:  
-   - 👤 **Normal User** → `user` / `1234`  
-   - 🔑 **Admin User** → `root` / `root`  
+✔️ **Student Management System** with **SQLite3 Database** 
+✔️ **Deliberate SQL Injection Vulnerability** for testing 
+✔️ **User Authentication System** (🚨 Vulnerable 🚨) 
+✔️ **Two Predefined Users in the Database**:
 ✔️ **Test & Improve Your SQL Injection Skills**  
 ✔️ **Designed for GNU/Linux** (❌ *Does NOT support Windows* ❌)  
 
