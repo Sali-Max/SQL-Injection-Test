@@ -218,7 +218,7 @@ bool edit_user(sqlite3* db, string userId)
     sqlite3_stmt* stmt;
     if(sqlite3_prepare_v2(db, command.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
     {
-        printf("Database Error\n");
+        printf("Database Error OR User Not Found \n");
         cin.get();
         return false;
     }
@@ -531,12 +531,11 @@ int main()
         #endif
 
         printf("1- Show Profile\n");
-        printf("2- Edit Profile\n");
         if(current_user.is_admin()) //  admin options
         {
-            printf("\n3- Create User\n");
-            printf("4- List All User\n");
-            printf("5- Search and Edit User\n\n");
+            printf("\n2- Create User\n");
+            printf("3- List All User\n");
+            printf("4- Search and Edit User\n\n");
 
         }
         printf("0- Exit\n");
@@ -551,11 +550,7 @@ int main()
             cout << "\n\nEnter key to continue";
             cin.get();
         }
-        else if(input == "2")
-        {
-            continue;
-        }
-        else if (input == "3")
+        else if (input == "2")
         {
             if(current_user.is_admin()) // Admin Check
             {
@@ -566,7 +561,7 @@ int main()
                 continue;
             }
         }
-        else if (input == "4")
+        else if (input == "3")
         {
             if(current_user.is_admin()) // Admin Check
             {
@@ -577,7 +572,7 @@ int main()
                 continue;
             }
         }
-        else if (input == "5")
+        else if (input == "4")
         {
             if(current_user.is_admin()) // Admin Check
             {
