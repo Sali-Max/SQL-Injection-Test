@@ -11,10 +11,10 @@ It is designed for **cybersecurity enthusiasts, ethical hackers, and penetration
 
 ## 🛠️ **Features & Vulnerabilities**  
 
-✔️ **Student Management System** with **SQLite3 Database** 
-💀 **Deliberate SQL Injection Vulnerability** for testing 
-🔑 **User Authentication System** (🚨 Vulnerable 🚨) 
-🐧 **Only Designed for GNU/Linux** (❌ *Does NOT support Windows* ❌)  
+✔️ **Student Management System** with **SQLite3 Database**  <br>
+💀 **Deliberate SQL Injection Vulnerability** for testing <br>
+🔑 **User Authentication System** (🚨 Vulnerable 🚨) <br>
+🐧 **Only Designed for GNU/Linux** (❌ *Does NOT support Windows* ❌) 
 
 ---
 
