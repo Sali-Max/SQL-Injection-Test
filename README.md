@@ -51,8 +51,9 @@ Use basic SQL Injection payloads to bypass authentication!
 
 Example:  
 ```
-Username: admin' --  
+Username: root' --  
 Password: (leave empty)
+CodeNumber: (leave empty)
 ```
 
 
