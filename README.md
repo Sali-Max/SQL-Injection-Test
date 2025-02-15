@@ -1,4 +1,4 @@
-# 🔥 Student Management System - SQL Injection Vulnerable 🔥  
+# 🔥 SQL Injection Vulnerable - Student Manager 🔥
 
 🚨 **WARNING: This program contains a deliberate SQL Injection vulnerability!** 🚨  
 
