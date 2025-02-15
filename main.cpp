@@ -177,7 +177,7 @@ bool createUser(sqlite3* db)
 
 
         string command = "INSERT INTO users (username, password, code, admin) VALUES ('"+ fullname +"', '"+ password +"', "+ studentCode +", "+ isAdmin +");";
-        printf("\ncommand: %s\n", command.c_str());
+        // printf("\ncommand: %s\n", command.c_str());
 
         char* errdb;
         int stt = sqlite3_exec(db, command.c_str(), nullptr, nullptr, &errdb);
@@ -251,21 +251,22 @@ bool edit_user(sqlite3* db, string userId)
             system("clear");
             #endif
             
-            
-            printf("%s-Username: %s \n", edited_user.getId().c_str(), edited_user.get_name().c_str());
+            printf("ID: %s\n", edited_user.getId().c_str());
+            printf("Username: %s \n", edited_user.get_name().c_str());
             printf("Password: %s \n \n", edited_user.get_password().c_str());
             
-            printf("1-Edit\n");
-            printf("2-Delete\n");
+            printf("1-Edit Username\n");
+            printf("2-Edit Password\n");
+            printf("3-Delete\n");
 
             
             if(edited_user.is_admin())
             {
-                printf("3-Downgrade to User\n");
+                printf("4-Downgrade to User\n");
             }
             else
             {
-                printf("3-Upgrade to Admin\n");
+                printf("4-Upgrade to Admin\n");
             }
             printf("9-Unsave and Exit\n");
             printf("0-Save and Exit\n");
@@ -278,59 +279,39 @@ bool edit_user(sqlite3* db, string userId)
 
             if(input == "1")
             { 
-                #ifdef __WIN32
-                system("cls");
-                #else
-                system("clear");
-                #endif
-                printf("1-Username\n");
-                printf("2-Password\n\n");
-
-                string select_usr_or_pass;
-                printf("#: ");
-                getline(cin,select_usr_or_pass);
-                printf("\n\n");
-
                 string changed_value;
-                string chagne_command;
-                if(select_usr_or_pass == "1")
-                {
-                    printf("Enter Username: ");
-                }
-                else if(select_usr_or_pass == "2")
-                {
-                    printf("Enter Password: ");
-                }
-                else
-                {
-                    printf("Invalid Number!");
-                    continue;
-                }
-
+                printf("Enter FullName: ");
                 getline(cin,changed_value);
+                cout << "\n";
                 
+                if(changed_value == "")
+                {
+                    printf("Value Error!");
+                    cin.get();
+                }
+
                 //Edite Cache
-                if(select_usr_or_pass == "1")
-                {
-                    edited_user.set_full_name(changed_value);
-                }
-                else if(select_usr_or_pass == "2")
-                {
-                    edited_user.set_password(changed_value);
-                }
-
-                printf("success");
-                cin.get();
-
-
-
-
+                edited_user.set_full_name(changed_value);
                 
+            }
+            else if(input == "2")
+            {
+                string changed_value;
+                printf("Enter Password: ");
+                getline(cin,changed_value);
+                cout << "\n";
 
+                if(changed_value == "")
+                {
+                    printf("Value Error!");
+                    cin.get();
+                }
+
+                edited_user.set_password(changed_value);
 
 
             }
-            else if(input == "2")
+            else if(input == "3")
             {
                 string command = "DELETE FROM users where id="+ edited_user.getId() +";";
                 char* errdb;
@@ -359,13 +340,10 @@ bool edit_user(sqlite3* db, string userId)
                 
                 
             }
-            else if(input == "3")
+            else if(input == "4")
             {                
                 //change cache
                 edited_user.is_admin() ? edited_user.set_admin(false) : edited_user.set_admin(true);
-
-                printf("success");
-                cin.get();
             }
             else if(input == "0")
             {
@@ -418,13 +396,13 @@ bool edit_user(sqlite3* db, string userId)
                 string delete_ok;
                 printf("Exit?(y/N): ");
                 getline(cin, delete_ok);
-                if(delete_ok != "y" || delete_ok != "Y")
+                if(delete_ok == "y" || delete_ok == "Y")
                 {
-                    continue;
+                    break;
                 }
                 else
                 {
-                    break;
+                    continue;
                 }
             }
             else
@@ -511,8 +489,6 @@ bool search_user(sqlite3* db, string searchText, int type)  // type 1(search wit
     
 }
 
- 
-
 int main()
 {
     sqlite3* DB;
@@ -560,7 +536,7 @@ int main()
         {
             printf("\n3- Create User\n");
             printf("4- List All User\n");
-            printf("5- Search User\n\n");
+            printf("5- Search and Edit User\n\n");
 
         }
         printf("0- Exit\n");
