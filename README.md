@@ -51,7 +51,7 @@ Username: root' --
 Password: (leave empty)
 CodeNumber: (leave empty)
 ```
-💡**You can make modifications as needed in the user search and edit(ROOT) sections**
+💡**You can make modifications as needed in the user search and edit(ROOT) sections** <br>
 💡**You can unintentionally escalate a restricted user to an admin user**
 
 ---
